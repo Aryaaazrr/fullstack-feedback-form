@@ -150,6 +150,62 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
     $(document).ready(function() {
+        loadFeedback();
+
+        function showAlert(type, message) {
+            $("#alertBox").html(`<div class="alert ${type}">${message}</div>`);
+            setTimeout(() => $("#alertBox").html(""), 4000);
+        }
+
+        function toggleSpinner(show) {
+            if (show) {
+                $("#spinner").show(), 400;
+            } else {
+                $("#spinner").hide();
+            }
+        }
+
+        function loadFeedback() {
+            toggleSpinner(true);
+            $.ajax({
+                url: "api/action-feedback.php",
+                method: "GET",
+                data: {
+                    action: 'load-feedback'
+                },
+                dataType: "json",
+                success: function(response) {
+                    let html = "";
+                    if (response.status === "success" && Array.isArray(response.message)) {
+                        response.message.forEach(item => {
+                            html += `
+                                <div class="feedback-${item.id}" 
+                                    style="border: 1px solid #ccc;
+                                            padding: 12px;
+                                            margin-bottom: 10px;
+                                            border-radius: 6px;
+                                            background: #fff;
+                                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05)">
+                                    <h4>${item.name}</h4>
+                                    <small>${item.email}</small>
+                                    <p>${item.comments}</p>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html = "<p>No feedback found.</p>";
+                    }
+                    $("#feedbackList").html(html);
+                },
+                error: function() {
+                    showAlert("Gagal memuat feedback", "error");
+                },
+                complete: function() {
+                    toggleSpinner(false);
+                }
+            });
+        }
+
         $("#feedbackForm").on("submit", function(e) {
             e.preventDefault();
             const name = $("input[name='name']").val().trim();
@@ -176,6 +232,7 @@
                     if (res.status == 'success') {
                         showAlert("success", res.message);
                         $("#feedbackForm")[0].reset();
+                        loadFeedback();
                     } else {
                         showAlert("error", res.message);
                     }
