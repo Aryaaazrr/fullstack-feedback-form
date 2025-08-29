@@ -36,7 +36,7 @@ fullstack-feedback-form/
 1. Clone repository atau download source code:
 
    ```bash
-   git clone https://github.com/username/fullstack-feedback-form.git
+   git clone https://github.com/Aryaaazrr/fullstack-feedback-form.git
    cd fullstack-feedback-form
    ```
 
